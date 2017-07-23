@@ -1,10 +1,12 @@
 package me.Unionjackjz1.Framework.commands;
 
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public abstract class FrameworkCommand {
 
@@ -17,13 +19,29 @@ public abstract class FrameworkCommand {
     private String[] aliases;
 
     public static Map<String, FrameworkCommand> instances = new HashMap<>();
+    public static Map<String, FrameworkCommand> aliasInstances = new HashMap<>();
 
     public FrameworkCommand(String name, String properUse, String description, String[] aliases) {
         this.name = name;
         this.properUse = properUse;
         this.description = description;
         this.aliases = aliases;
-        instances.put(name, this);
+        instances.put(name.toLowerCase(), this);
+        for (String alias : aliases) {
+        	aliasInstances.put(alias.toLowerCase(), this);
+        }
+    }
+    
+    public static FrameworkCommand get(String arg) {
+    	FrameworkCommand cmd = instances.get(arg);
+    	if (cmd == null)  {
+    		cmd = aliasInstances.get(arg);
+    	}
+    	
+    	if (cmd != null) {
+    		return cmd;
+    	}
+    	return null;
     }
 
     public String getName() {
@@ -42,27 +60,31 @@ public abstract class FrameworkCommand {
         return aliases;
     }
 
-    public void help(Player sender, boolean description) {
+    public void help(CommandSender sender, boolean description) {
         sender.sendMessage(ChatColor.RED + "Proper Usage: " + properUse);
         if (description) {
-            sender.sendMessage(ChatColor.YELLOW + FrameworkCommand.description);
+            sender.sendMessage(ChatColor.YELLOW + this.description);
         }
     }
+    
+    public boolean hasPermission(CommandSender sender) {
+    	return sender.hasPermission("onion.commands");
+    }
 
-    public void noPermission(Player sender) {
+    public void noPermission(CommandSender sender) {
         sender.sendMessage(ChatColor.RED + "You don't have permission to use " + name + " !");
     }
 
-    protected boolean correctLength(Player sender, int size, int min, int max) {
+    protected boolean correctLength(CommandSender sender, int size, int min, int max) {
         if (size < min || size > max) {
-            FrameworkCommand.help(sender, false);
+            help(sender, false);
             return false;
         } else {
             return true;
         }
     }
 
-    protected boolean isPlayer(Player sender) {
+    protected boolean isPlayer(CommandSender sender) {
         if (sender instanceof Player) {
             return true;
         } else {
