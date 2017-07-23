@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Framework:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Framework_jar</output-path>
+    <root id="archive" name="Framework.jar">
+      <element id="module-output" name="Framework" />
+      <element id="extracted-dir" path="$USER_HOME$/Desktop/Server/spigot.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

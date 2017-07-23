@@ -1,0 +1,14 @@
+name: Onionz
+version: 1.0
+author: Unionjackjz1
+main: me.Unionjackjz1.Framework.Main
+commands:
+  hole:
+    description: Drops player into void
+    usage: /hole <players>
+  particle:
+    description: Particles around player
+    usage: /particle
+permissions:
+  onion.hole:
+    default: op
