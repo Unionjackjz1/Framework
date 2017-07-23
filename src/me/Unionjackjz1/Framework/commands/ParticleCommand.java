@@ -10,7 +10,8 @@ public class ParticleCommand extends FrameworkCommand {
         super("particle", "/particle","Toggles Particles", new String[]{"/particle"});
     }
 
-    public static void execute(Player sender, List<String> args) {
+    @Override
+    public void execute(Player sender, List<String> args) {
         sender.sendMessage(ChatColor.RED + "PARTICLE COMMAND STILL IN DEVELOPMENT");
     }
 }
