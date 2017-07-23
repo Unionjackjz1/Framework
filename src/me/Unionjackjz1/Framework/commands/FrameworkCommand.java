@@ -8,25 +8,25 @@ import java.util.Map;
 
 public abstract class FrameworkCommand {
 
-    private static String name;
+    private String name;
 
-    private static String properUse;
+    private String properUse;
 
-    private static String description;
+    private String description;
 
-    private final String[] aliases;
+    private String[] aliases;
 
-    public static Map<String, FrameworkCommand> instances = new HashMap<String, FrameworkCommand>();
+    public static Map<String, FrameworkCommand> instances = new HashMap<>();
 
     public FrameworkCommand(String name, String properUse, String description, String[] aliases) {
-        FrameworkCommand.name = name;
-        FrameworkCommand.properUse = properUse;
-        FrameworkCommand.description = description;
+        this.name = name;
+        this.properUse = properUse;
+        this.description = description;
         this.aliases = aliases;
         instances.put(name, this);
     }
 
-    public static String getName() {
+    public String getName() {
         return name;
     }
 
@@ -42,18 +42,18 @@ public abstract class FrameworkCommand {
         return aliases;
     }
 
-    public static void help(Player sender, boolean description) {
+    public void help(Player sender, boolean description) {
         sender.sendMessage(ChatColor.RED + "Proper Usage: " + properUse);
         if (description) {
             sender.sendMessage(ChatColor.YELLOW + FrameworkCommand.description);
         }
     }
 
-    public static void noPermission(Player sender) {
+    public void noPermission(Player sender) {
         sender.sendMessage(ChatColor.RED + "You don't have permission to use " + name + " !");
     }
 
-    protected static boolean correctLength(Player sender, int size, int min, int max) {
+    protected boolean correctLength(Player sender, int size, int min, int max) {
         if (size < min || size > max) {
             FrameworkCommand.help(sender, false);
             return false;
@@ -62,7 +62,7 @@ public abstract class FrameworkCommand {
         }
     }
 
-    protected static boolean isPlayer(Player sender) {
+    protected boolean isPlayer(Player sender) {
         if (sender instanceof Player) {
             return true;
         } else {
@@ -70,4 +70,6 @@ public abstract class FrameworkCommand {
             return false;
         }
     }
+    
+    public abstract void execute(CommandSender sender, List<String> args);
 }
