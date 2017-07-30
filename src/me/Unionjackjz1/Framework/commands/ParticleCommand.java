@@ -8,15 +8,16 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import me.Unionjackjz1.Framework.utils.ParticleManager;
+import me.Unionjackjz1.Framework.utils.ParticleManager.Pattern;
 
 public class ParticleCommand extends FrameworkCommand {
     public ParticleCommand() {
-        super("particle", "/framework particle <arg>","Toggles Particles", new String[]{"particle", "p"});
+        super("particle", "/framework particle <particle> <pattern>","Toggles Particles", new String[]{"particle", "p"});
     }
 
     @Override
     public void execute(CommandSender sender, List<String> args) {
-    	if (!correctLength(sender, args.size(), 0, 1)) {
+    	if (!correctLength(sender, args.size(), 0, 2)) {
     		return;
     	}
     	
@@ -25,11 +26,11 @@ public class ParticleCommand extends FrameworkCommand {
     	}
     	
     	Player player = (Player) sender;
-    	
     	boolean remove = false;
-    	
+    	Pattern pattern = Pattern.CIRCLE;
     	Particle particle = Particle.FIREWORKS_SPARK;
-    	if (args.size() == 1) {
+    	
+    	if (args.size() >= 1) {
     		if (args.get(0).equalsIgnoreCase("remove")) {
     			remove = ParticleManager.isTracking(player);
     			if (!remove) {
@@ -48,12 +49,24 @@ public class ParticleCommand extends FrameworkCommand {
     		remove = ParticleManager.isTracking(player);
     	}
     	
+    	if (args.size() == 2) {
+    		try {
+    			pattern = Pattern.valueOf(args.get(1).toUpperCase());
+    		} catch (IllegalArgumentException e) {
+    			sender.sendMessage(ChatColor.RED + "Pattern not found!");
+				return;
+    		}
+    		sender.sendMessage(ChatColor.GREEN + "Pattern set to " + pattern.toString());
+    	}
+    	
+    	ParticleManager.setPattern(player, pattern);
+    	
     	if (remove) {
     		ParticleManager.remove(player);
     		sender.sendMessage(ChatColor.GREEN + "Particles removed!");
     	} else {
     		ParticleManager.track(player, particle);
-    		sender.sendMessage(ChatColor.GREEN + "Particles set!");
+    		sender.sendMessage(ChatColor.GREEN + "Particles set to " + particle.toString());
     	}
     }
 }
