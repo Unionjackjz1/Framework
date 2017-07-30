@@ -10,21 +10,81 @@ import org.bukkit.entity.Player;
 public class ParticleManager implements Runnable{
 	
 	private static Map<Player, Particle> tracker = new HashMap<>();
-	private static float  angle = 0;
-	private static double y     = 0;
+	private static Map<Player, Pattern> patterns = new HashMap<>();
+	private static float   angle = 0;
+	private static double  y     = 0;
+	private static boolean up    = true;
 
 	@Override
 	public void run() {
+		if (tracker.isEmpty()) return;
 		for (Player player : tracker.keySet()) {
-			Location display = player.getLocation().clone();
-			display.setY(display.getY()+y);
-			display.setPitch(0);
-			display.setYaw(angle);
-			display.add(display.getDirection().multiply(1));
-			player.getWorld().spawnParticle(tracker.get(player), display, 0, 0, 0, 1, 0);
+			display(player);
 		}
-		y = y >= 1.9 ? 0 : y + 0.04;
+		if (up) {
+			if (y >= 1.9) up = false;
+			else y += 0.04;
+		} else {
+			if (y <= 0) up = true;
+			else y -= 0.04;
+		}
 		angle = angle >= 180 ? -180 : angle + 15;
+	}
+	
+	private void display(Player player) {
+		Pattern pattern = patterns.get(player);
+		switch (pattern) {
+			case CIRCLE:
+				displayCircle(player);
+				break;
+			case HELIX:
+				displayHelix(player);
+				break;
+			case DOUBLE_HELIX:
+				displayDoubleHelix(player);
+				break;
+			case CROWN:
+				displayCrown(player);
+				break;
+		}
+	}
+	
+	private void displayCircle(Player player) {
+		Location loc = player.getLocation().clone();
+		loc.setPitch(0);
+		loc.setYaw(angle);
+		loc.add(loc.getDirection().multiply(1));
+		loc.getWorld().spawnParticle(tracker.get(player), loc, 0, 0, 0, 1, 0);
+	}
+	
+	private void displayHelix(Player player) {
+		Location loc = player.getLocation().clone();
+		loc.setPitch(0);
+		loc.setYaw(angle);
+		loc.setY(loc.getY() + y);
+		loc.add(loc.getDirection().multiply(1));
+		loc.getWorld().spawnParticle(tracker.get(player), loc, 0, 0, 0, 1, 0);
+	}
+
+	private void displayDoubleHelix(Player player) {
+		displayHelix(player);
+		Location loc = player.getLocation().clone();
+		loc.setPitch(0);
+		loc.setYaw(-angle);
+		loc.setY(loc.getY() + y);
+		loc.add(loc.getDirection().multiply(1));
+		loc.getWorld().spawnParticle(tracker.get(player), loc, 0, 0, 0, 1, 0);
+	}
+	
+	private void displayCrown(Player player) {
+		for (int i = -180; i < 180; i += 20) {
+			Location loc = player.getEyeLocation().clone();
+			loc.setPitch(0);
+			loc.setYaw(i);
+			loc.setY(loc.getY() + 0.35);
+			loc.add(loc.getDirection().multiply(0.4));
+			loc.getWorld().spawnParticle(tracker.get(player), loc, 0, 0, 0, 1, 0);
+		}
 	}
 
 	public static void track(Player player, Particle particle) {
@@ -37,5 +97,20 @@ public class ParticleManager implements Runnable{
 	
 	public static boolean isTracking(Player player) {
 		return tracker.containsKey(player);
+	}
+	
+	public static void setPattern(Player player, Pattern pattern) {
+		patterns.put(player, pattern);
+	}
+	
+	public static Pattern getPattern(Player player) {
+		return patterns.get(player);
+	}
+	
+	public static enum Pattern {
+		CIRCLE,
+		HELIX,
+		DOUBLE_HELIX,
+		CROWN;
 	}
 }
